@@ -1,0 +1,95 @@
+(async function() {
+    // Function to delay execution for a given number of milliseconds
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Function to generate a random delay between 1 minute and 3 minutes
+    function getRandomDelay() {
+        const min = 1 * 60 * 1000; // 1 minute in milliseconds
+        const max = 3 * 60 * 1000; // 3 minutes in milliseconds
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Function to send an invitation
+    async function sendInvitation(profileDiv) {
+        try {
+            // Click on the name of the person
+            const nameElement = profileDiv.querySelector('a[data-control-name="view_lead_panel_via_search_lead_name"]');
+            const fullName = nameElement.textContent.trim();
+            const firstName = fullName.split(' ')[0];
+            nameElement.click();
+            await delay(2000); // Wait for navigation to complete
+
+            // Click on the options button
+            const optionsButton = profileDiv.querySelector('button[data-search-overflow-trigger]');
+            optionsButton.click();
+            await delay(2000); // Wait for the options menu to open
+
+            // Click on the connect button
+            const connectButton = Array.from(document.querySelectorAll('button')).find(btn => btn.innerText === 'Connect');
+            if (!connectButton) {
+                console.log('Connect button not found, skipping.');
+                return false;
+            }
+            connectButton.click();
+            await delay(2000); // Wait for the connect modal to open
+
+            // Fill in the message
+            const messageTextarea = document.getElementById('connect-cta-form__invitation');
+            if (!messageTextarea) {
+                console.log('Message textarea not found, skipping.');
+                return false;
+            }
+            const message = `Hello ${firstName},\n\nI am reaching out to you to discuss a potential collaboration and would like to connect with you.`;
+            messageTextarea.value = message;
+            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // Click the send button
+            const sendButton = Array.from(document.querySelectorAll('button')).find(btn => btn.innerText === 'Send Invitation');
+            if (sendButton) {
+                sendButton.click();
+                await delay(2000); // Wait for the invitation to be sent
+                console.log('Invitation sent successfully.');
+            } else {
+                console.log('Send button not found, skipping.');
+            }
+
+        } catch (e) {
+            console.log(`An error occurred: ${e.message}`);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Main function to process all profile divs
+    async function processProfiles() {
+        // Get all profile divs
+        const profileDivs = document.querySelectorAll('li.artdeco-list__item');
+
+        for (const profileDiv of profileDivs) {
+            // Check if "Viewed" is present in the div
+            const viewedElement = profileDiv.querySelector('span[aria-hidden="true"][class="ml1 t-bold"]');
+            if (viewedElement && viewedElement.textContent.trim() === 'Viewed') {
+                console.log('Already viewed, skipping.');
+                continue;
+            }
+
+            // Attempt to send the invitation
+            if (await sendInvitation(profileDiv)) {
+                console.log('Invitation process completed.');
+            } else {
+                console.log('Failed to complete the invitation process.');
+            }
+
+            // Randomize the delay before processing the next profile
+            const randomDelay = getRandomDelay();
+            console.log(`Waiting for ${randomDelay / 1000} seconds before processing the next profile.`);
+            await delay(randomDelay); // Wait for a random time between 1 and 3 minutes
+        }
+    }
+
+    // Start processing profiles
+    await processProfiles();
+})();
