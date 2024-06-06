@@ -4,11 +4,30 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    // Function to generate a random delay between 5 seconds and 1 minute
+    // Function to generate a random delay between 5 seconds and 15 seconds
     function getRandomDelay() {
         const min = 5 * 1000; // 5 seconds in milliseconds
-        const max = 20 * 1000; // 1 minute in milliseconds
+        const max = 15 * 1000; // 15 seconds in milliseconds
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Function to wait until the page is fully loaded
+    function waitForPageLoad() {
+        return new Promise(resolve => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+    }
+
+    // Function to scroll to the bottom and then back up the page
+    async function scrollPage() {
+        window.scrollTo(0, document.body.scrollHeight);
+        await delay(2000); // Wait for 2 seconds
+        window.scrollTo(0, 0);
+        await delay(2000); // Wait for 2 seconds
     }
 
     // Function to send an invitation
@@ -64,12 +83,17 @@
         return true;
     }
 
-    // Main function to process all profile divs
-    async function processProfiles() {
+    // Function to process all profile divs
+    async function processProfiles(inviteCount) {
         // Get all profile divs
         const profileDivs = document.querySelectorAll('li.artdeco-list__item');
 
         for (const profileDiv of profileDivs) {
+            if (inviteCount >= 25) {
+                console.log('Maximum invite limit reached. Stopping the process.');
+                return inviteCount;
+            }
+
             // Check if "Viewed" is present in the div
             const viewedElement = profileDiv.querySelector('span[aria-hidden="true"][class="ml1 t-bold"]');
             if (viewedElement && viewedElement.textContent.trim() === 'Viewed') {
@@ -80,17 +104,52 @@
             // Attempt to send the invitation
             const inviteSent = await sendInvitation(profileDiv);
             if (inviteSent) {
-                console.log('Invitation process completed.');
+                inviteCount++; // Increment the counter if an invitation is sent
+                console.log(`Invitation process completed. Total invites sent so far: ${inviteCount}.`);
                 // Randomize the delay only after sending an invitation
                 const randomDelay = getRandomDelay();
                 console.log(`Waiting for ${randomDelay / 1000} seconds before processing the next profile.`);
-                await delay(randomDelay); // Wait for a random time between 5 seconds and 1 minute
+                await delay(randomDelay); // Wait for a random time between 5 seconds and 15 seconds
             } else {
                 console.log('Failed to complete the invitation process.');
             }
         }
+
+        return inviteCount;
     }
 
-    // Start processing profiles
-    await processProfiles();
+    // Function to click the "Next" button
+    async function clickNextButton() {
+        const nextButton = Array.from(document.querySelectorAll('span.artdeco-button__text')).find(span => span.innerText === 'Next');
+        if (nextButton) {
+            nextButton.click();
+            await delay(5000); // Wait for the next page to load
+            return true;
+        }
+        return false;
+    }
+
+    // Main function to start the process
+    async function startProcess() {
+        await waitForPageLoad();
+        console.log('Page loaded completely.');
+
+        let inviteCount = 0;
+        let hasNextPage = true;
+
+        while (inviteCount < 25 && hasNextPage) {
+            if (inviteCount < 25) {
+                hasNextPage = await clickNextButton();
+                if (hasNextPage) {
+                    await scrollPage(); // Scroll to the bottom and then back up before processing the new page
+                }
+            }
+            inviteCount = await processProfiles(inviteCount);
+        }
+
+        console.log(`Process completed. Total invites sent: ${inviteCount}.`);
+    }
+
+    // Start the process
+    await startProcess();
 })();
