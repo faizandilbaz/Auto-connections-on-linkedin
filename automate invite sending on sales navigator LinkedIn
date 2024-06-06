@@ -4,10 +4,10 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    // Function to generate a random delay between 1 minute and 3 minutes
+    // Function to generate a random delay between 5 seconds and 1 minute
     function getRandomDelay() {
-        const min = 1 * 60 * 1000; // 1 minute in milliseconds
-        const max = 3 * 60 * 1000; // 3 minutes in milliseconds
+        const min = 5 * 1000; // 5 seconds in milliseconds
+        const max = 60 * 1000; // 1 minute in milliseconds
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
@@ -53,6 +53,7 @@
                 console.log('Invitation sent successfully.');
             } else {
                 console.log('Send button not found, skipping.');
+                return false;
             }
 
         } catch (e) {
@@ -77,16 +78,16 @@
             }
 
             // Attempt to send the invitation
-            if (await sendInvitation(profileDiv)) {
+            const inviteSent = await sendInvitation(profileDiv);
+            if (inviteSent) {
                 console.log('Invitation process completed.');
+                // Randomize the delay only after sending an invitation
+                const randomDelay = getRandomDelay();
+                console.log(`Waiting for ${randomDelay / 1000} seconds before processing the next profile.`);
+                await delay(randomDelay); // Wait for a random time between 5 seconds and 1 minute
             } else {
                 console.log('Failed to complete the invitation process.');
             }
-
-            // Randomize the delay before processing the next profile
-            const randomDelay = getRandomDelay();
-            console.log(`Waiting for ${randomDelay / 1000} seconds before processing the next profile.`);
-            await delay(randomDelay); // Wait for a random time between 1 and 3 minutes
         }
     }
 
