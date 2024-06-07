@@ -1,10 +1,14 @@
 function automateMessaging() {
     const listItems = document.querySelectorAll('li.artdeco-list__item.pl3.pv3');
     let count = 0;
+    let messagesSent = 0;
 
     function processListItem(index) {
-        if (index >= listItems.length || count >= 25) {
-            console.log(`Processed ${count} people. Stopping now.`);
+        if (index >= listItems.length || messagesSent >= 25) {
+            console.log(`Processed ${count} people and sent ${messagesSent} messages. Stopping now.`);
+            if (messagesSent >= 25) {
+                alert("25 messages have been sent!");
+            }
             return;
         }
 
@@ -12,6 +16,7 @@ function automateMessaging() {
         const viewedSpan = item.querySelector('span.ml1.t-bold');
         if (viewedSpan && viewedSpan.textContent.includes('Viewed')) {
             console.log('Skipping viewed profile');
+            count++;
             processListItem(index + 1);
             return;
         }
@@ -51,10 +56,11 @@ To get an idea of the quality of our work, you can review our portfolio:
 
 Case Studies: Behance (www.behance.net/busona)
 UI Designs: Dribbble (www.dribbble.com/busona)
+Website: www.busona.com
 
-If you're interested or if our services align with your needs, I would love to discuss this further.
+If you're interested to collaborate for design services or if our services align with your needs, I would love to discuss this further.
 
-Please let me know your availability, and we can schedule a meeting at a time that works for both of us.
+If you’d like to discuss anything in detail, please let me know your availability, and we can schedule a meeting at a time that works for both of us.
 
 I am excited to hear from you.
 
@@ -74,6 +80,8 @@ Thank you.
                             closeButton.addEventListener('click', () => {
                                 setTimeout(() => {
                                     console.log('Closed message overlay for:', fullName);
+                                    messagesSent++;
+                                    console.log(`Messages sent so far: ${messagesSent}`);
                                     processListItem(index + 1);
                                 }, 2000); // Wait 2 seconds after closing to move to the next person
                             });
@@ -86,6 +94,7 @@ Thank you.
             }, 2000); // Wait for the profile page to load
         } else {
             console.error('Message button or name link not found for item at index', index);
+            count++;
             processListItem(index + 1);
         }
     }
