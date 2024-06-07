@@ -1,0 +1,97 @@
+function automateMessaging() {
+    const listItems = document.querySelectorAll('li.artdeco-list__item.pl3.pv3');
+    let count = 0;
+
+    function processListItem(index) {
+        if (index >= listItems.length || count >= 25) {
+            console.log(`Processed ${count} people. Stopping now.`);
+            return;
+        }
+
+        const item = listItems[index];
+        const viewedSpan = item.querySelector('span.ml1.t-bold');
+        if (viewedSpan && viewedSpan.textContent.includes('Viewed')) {
+            console.log('Skipping viewed profile');
+            processListItem(index + 1);
+            return;
+        }
+
+        const nameLink = item.querySelector('a[data-lead-search-result^="profile-link"]');
+        const messageButton = item.querySelector('button[aria-label^="Message"]');
+
+        if (nameLink && messageButton) {
+            nameLink.click();
+            console.log('Clicked name link:', nameLink.textContent.trim());
+
+            setTimeout(() => {
+                messageButton.click();
+                console.log('Clicked message button for:', nameLink.textContent.trim());
+
+                setTimeout(() => {
+                    const nameElement = document.querySelector('h2.t-bold span[data-anonymize="person-name"]');
+                    const fullName = nameElement ? nameElement.textContent.trim() : '';
+                    const firstName = fullName.split(' ')[0];
+
+                    const subjectField = document.querySelector('input.compose-form__subject-field');
+                    if (subjectField) {
+                        subjectField.value = "Looking forward to Collaborate";
+                        subjectField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    const messageField = document.querySelector('textarea.compose-form__message-field');
+                    if (messageField) {
+                        const messageContent = `
+Hi ${firstName},
+
+I hope you're doing well.
+
+We specialize in providing top-notch UI/UX design and development services.
+
+To get an idea of the quality of our work, you can review our portfolio:
+
+Case Studies: Behance (www.behance.net/busona)
+UI Designs: Dribbble (www.dribbble.com/busona)
+
+If you're interested or if our services align with your needs, I would love to discuss this further.
+
+Please let me know your availability, and we can schedule a meeting at a time that works for both of us.
+
+I am excited to hear from you.
+
+Thank you.
+                        `;
+                        messageField.value = messageContent.trim();
+                        messageField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    console.log('Subject and message written. Please send the message manually and close the popup.');
+
+                    function checkForCloseButton() {
+                        const closeButton = document.querySelector('button[data-control-name="overlay.close_overlay"]');
+                        if (!closeButton) {
+                            setTimeout(checkForCloseButton, 1000); // Check again after 1 second
+                        } else {
+                            closeButton.addEventListener('click', () => {
+                                setTimeout(() => {
+                                    console.log('Closed message overlay for:', fullName);
+                                    processListItem(index + 1);
+                                }, 2000); // Wait 2 seconds after closing to move to the next person
+                            });
+                        }
+                    }
+
+                    checkForCloseButton();
+
+                }, 3000); // Wait for the message overlay to appear
+            }, 2000); // Wait for the profile page to load
+        } else {
+            console.error('Message button or name link not found for item at index', index);
+            processListItem(index + 1);
+        }
+    }
+
+    processListItem(0);
+}
+
+// Run the function to start the automation
+automateMessaging();
