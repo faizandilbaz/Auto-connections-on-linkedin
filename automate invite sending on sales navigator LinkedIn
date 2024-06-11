@@ -1,4 +1,8 @@
 (async function() {
+    // Configuration options
+    const MAX_INVITES = 25; // Maximum number of invites to send
+    const ENABLE_PAGE_RELOAD = true; // Enable or disable page reload
+
     // Function to delay execution for a given number of milliseconds
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -89,7 +93,7 @@
         const profileDivs = document.querySelectorAll('li.artdeco-list__item');
 
         for (const profileDiv of profileDivs) {
-            if (inviteCount >= 25) {
+            if (inviteCount >= MAX_INVITES) {
                 console.log('Maximum invite limit reached. Stopping the process.');
                 return inviteCount;
             }
@@ -137,14 +141,16 @@
         let inviteCount = 0;
         let hasNextPage = true;
 
-        while (inviteCount < 25 && hasNextPage) {
-            if (inviteCount < 25) {
+        // Process profiles on the first page before moving to the next page
+        while (inviteCount < MAX_INVITES && hasNextPage) {
+            inviteCount = await processProfiles(inviteCount);
+
+            if (inviteCount < MAX_INVITES) {
                 hasNextPage = await clickNextButton();
-                if (hasNextPage) {
+                if (hasNextPage && ENABLE_PAGE_RELOAD) {
                     await scrollPage(); // Scroll to the bottom and then back up before processing the new page
                 }
             }
-            inviteCount = await processProfiles(inviteCount);
         }
 
         console.log(`Process completed. Total invites sent: ${inviteCount}.`);
