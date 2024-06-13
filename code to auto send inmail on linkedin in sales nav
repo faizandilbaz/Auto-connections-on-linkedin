@@ -48,8 +48,6 @@ function automateMessaging() {
                         const messageContent = `
 Hi ${firstName},
 
-Hi Kari,
-
 I hope you're doing well.
 
 We specialize in providing top-notch UI/UX design and development services.
