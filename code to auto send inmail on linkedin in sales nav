@@ -49,21 +49,14 @@ function automateMessaging() {
 Hi ${firstName},
 
 I hope you're doing well.
-
 We specialize in providing top-notch UI/UX design and development services.
-
-To get an idea of the quality of our work, you can review our portfolio:
-
+To get an idea of the quality of our work, Please check our portfolio:
 Case Studies: Behance (www.behance.net/busona)
 UI Designs: Dribbble (www.dribbble.com/busona)
-Website: www.busona.com
-
+Website: (www.busona.com)
 If you're interested to collaborate for design services or if our services align with your needs, I would love to discuss this further.
-
 If you’d like to discuss anything in detail, please let me know your availability, and we can schedule a meeting at a time that works for both of us.
-
 I am excited to hear from you.
-
 Thank you.
                         `;
                         messageField.value = messageContent.trim();
