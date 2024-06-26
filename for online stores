@@ -1,0 +1,161 @@
+(async function() {
+    // Configuration options
+    const MAX_INVITES = 25; // Maximum number of invites to send
+    const ENABLE_PAGE_RELOAD = true; // Enable or disable page reload
+
+    // Function to delay execution for a given number of milliseconds
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Function to generate a random delay between 5 seconds and 15 seconds
+    function getRandomDelay() {
+        const min = 3 * 1000; // 5 seconds in milliseconds
+        const max = 5 * 1000; // 15 seconds in milliseconds
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Function to wait until the page is fully loaded
+    function waitForPageLoad() {
+        return new Promise(resolve => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+    }
+
+    // Function to scroll to the bottom and then back up the page
+    async function scrollPage() {
+        window.scrollTo(0, document.body.scrollHeight);
+        await delay(2000); // Wait for 2 seconds
+        window.scrollTo(0, 0);
+        await delay(2000); // Wait for 2 seconds
+    }
+
+    // Function to send an invitation
+    async function sendInvitation(profileDiv) {
+        try {
+            // Click on the name of the person
+            const nameElement = profileDiv.querySelector('a[data-control-name="view_lead_panel_via_search_lead_name"]');
+            const fullName = nameElement.textContent.trim();
+            const firstName = fullName.split(' ')[0];
+            nameElement.click();
+            await delay(2000); // Wait for navigation to complete
+
+            // Click on the options button
+            const optionsButton = profileDiv.querySelector('button[data-search-overflow-trigger]');
+            optionsButton.click();
+            await delay(2000); // Wait for the options menu to open
+
+            // Click on the connect button
+            const connectButton = Array.from(document.querySelectorAll('button')).find(btn => btn.innerText === 'Connect');
+            if (!connectButton) {
+                console.log('Connect button not found, skipping.');
+                return false;
+            }
+            connectButton.click();
+            await delay(2000); // Wait for the connect modal to open
+
+            // Fill in the message
+            const messageTextarea = document.getElementById('connect-cta-form__invitation');
+            if (!messageTextarea) {
+                console.log('Message textarea not found, skipping.');
+                return false;
+            }
+            const message = `Hi ${firstName},\nI hope you're doing well.\n\nWe specialize in transforming online stores to enhance client retention and drive sales growth.\nI'd love to connect and discuss how we can elevate your store's design to deliver a more engaging and profitable user experience.\n\nLooking forward to connecting!`;
+            messageTextarea.value = message;
+            messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // Click the send button
+            const sendButton = Array.from(document.querySelectorAll('button')).find(btn => btn.innerText === 'Send Invitation');
+            if (sendButton) {
+                sendButton.click();
+                await delay(2000); // Wait for the invitation to be sent
+                console.log('Invitation sent successfully.');
+            } else {
+                console.log('Send button not found, skipping.');
+                return false;
+            }
+
+        } catch (e) {
+            console.log(`An error occurred: ${e.message}`);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Function to process all profile divs
+    async function processProfiles(inviteCount) {
+        // Get all profile divs
+        const profileDivs = document.querySelectorAll('li.artdeco-list__item');
+
+        for (const profileDiv of profileDivs) {
+            if (inviteCount >= MAX_INVITES) {
+                console.log('Maximum invite limit reached. Stopping the process.');
+                return inviteCount;
+            }
+
+            // Check if "Viewed" is present in the div
+            const viewedElement = profileDiv.querySelector('span[aria-hidden="true"][class="ml1 t-bold"]');
+            if (viewedElement && viewedElement.textContent.trim() === 'Viewed') {
+                console.log('Already viewed, skipping.');
+                continue;
+            }
+
+            // Attempt to send the invitation
+            const inviteSent = await sendInvitation(profileDiv);
+            if (inviteSent) {
+                inviteCount++; // Increment the counter if an invitation is sent
+                console.log(`Invitation process completed. Total invites sent so far: ${inviteCount}.`);
+                // Randomize the delay only after sending an invitation
+                const randomDelay = getRandomDelay();
+                console.log(`Waiting for ${randomDelay / 1000} seconds before processing the next profile.`);
+                await delay(randomDelay); // Wait for a random time between 5 seconds and 15 seconds
+            } else {
+                console.log('Failed to complete the invitation process.');
+            }
+        }
+
+        return inviteCount;
+    }
+
+    // Function to click the "Next" button
+    async function clickNextButton() {
+        const nextButton = Array.from(document.querySelectorAll('span.artdeco-button__text')).find(span => span.innerText === 'Next');
+        if (nextButton) {
+            nextButton.click();
+            await delay(5000); // Wait for the next page to load
+            return true;
+        }
+        return false;
+    }
+
+    // Main function to start the process
+    async function startProcess() {
+        await waitForPageLoad();
+        console.log('Page loaded completely.');
+
+        let inviteCount = 0;
+        let hasNextPage = true;
+
+        // Process profiles on the first page before moving to the next page
+        while (inviteCount < MAX_INVITES && hasNextPage) {
+            inviteCount = await processProfiles(inviteCount);
+
+            if (inviteCount < MAX_INVITES) {
+                hasNextPage = await clickNextButton();
+                if (hasNextPage && ENABLE_PAGE_RELOAD) {
+                    await scrollPage(); // Scroll to the bottom and then back up before processing the new page
+                }
+            }
+        }
+
+        console.log(`Process completed. Total invites sent: ${inviteCount}.`);
+    }
+
+    // Start the process
+    await startProcess();
+})();
