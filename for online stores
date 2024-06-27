@@ -64,7 +64,7 @@
                 console.log('Message textarea not found, skipping.');
                 return false;
             }
-            const message = `Hi ${firstName},\nI hope you're doing well.\n\nWe specialize in transforming online stores to enhance client retention and drive sales growth.\nI'd love to connect and discuss how we can elevate your store's design to deliver a more engaging and profitable user experience.\n\nLooking forward to connecting!`;
+            const message = `Hi ${firstName},\nI hope you're doing well.\n\nWe specialize in transforming websites to enhance client retention and drive sales growth.\nI'd love to connect and discuss how we can elevate your website's design to deliver a more engaging and profitable user experience.\n\nLooking forward to connecting!`;
             messageTextarea.value = message;
             messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
 
