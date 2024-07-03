@@ -11,7 +11,7 @@
     // Function to generate a random delay between 5 seconds and 15 seconds
     function getRandomDelay() {
         const min = 2 * 1000; // 5 seconds in milliseconds
-        const max = 5 * 1000; // 15 seconds in milliseconds
+        const max = 3 * 1000; // 15 seconds in milliseconds
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
@@ -64,7 +64,7 @@
                 console.log('Message textarea not found, skipping.');
                 return false;
             }
-            const message = `Hi ${firstName},\n\nI hope you're doing well.\n\nI'm reaching out to see if you are looking for design or development services for your projects. \nI would love to connect and discuss how we can assist you in achieving your goals, and share our portfolio.\n\nLooking forward to connecting!`;
+            const message = `Hello ${firstName},\nHope you're doing great.\n\nI believe I can bring value to your business through my expertise.\nLet's connect and discuss how I can help!\n\nThank you!`;
 
             messageTextarea.value = message;
             messageTextarea.dispatchEvent(new Event('input', { bubbles: true }));
