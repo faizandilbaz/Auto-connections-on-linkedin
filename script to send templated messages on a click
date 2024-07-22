@@ -1,0 +1,203 @@
+// Initial template messages
+let messages = [
+    {
+        name: "Short pitch",
+        content: `Hey {name},\n\nThanks for getting connected! 😊\n\nAre you looking for Website, Web Application, or Mobile App (Design or Development) services?`
+    },
+    {
+        name: "Closing message: person not interested at the moment",
+        content: `Got it, {name},😀\n\nThank you for your response and for letting me know.\n\nIf you ever need any assistance with UI/UX design or modern website development in the future, please feel free to reach out.\n\nI'd be more than happy to help.\n\nStay in touch, and best of luck with your endeavors!\n\nHave a great day ahead :)`
+    },
+    {
+        name: "Detailed pitch",
+        content: `Hey {name},\n\nThanks for getting connected! 😊\n\nAre you looking for design or development services?\n\nWe specialize in UI/UX Design and Development services.\n\nIf you're planning to give your website a stunning look, please let me know and we can schedule a meeting and talk about everything in detail.\n\nIf you like I can also share our portfolio so that you can get a better understanding regarding the quality of our work. :)`
+    },
+    {
+        name: "Our details",
+        content: `Check out our portfolio:\n\nCase Studies: (www.behance.net/busona)\nUI Designs: (www.dribbble.com/busona)\nClient Reviews: (www.clutch.co/profile/busona)\n\nOur Website: (www.busona.com)`
+    },
+    {
+        name: "Follow up",
+        content: `Hi {name},\n\nI wanted to check in case my initial message got lost in the shuffle!`
+    },
+    {
+        name: "Recent jobs",
+        content: `We’ve helped companies to enhance their user experiences such as:\n\nhttps://www.mentalfitlife.com/\nhttps://www.flarefs.com/\nhttps://www.goimpart.com/\nhttps://aivirtualagents.io/\nhttps://www.alchemative.com/\nhttps://stacksharp.com/`
+    }
+];
+
+// Function to insert the selected message into the message box
+function selectMessage(messageTemplate) {
+    const nameElement = document.querySelector('li.p4 ._name_1sdjqx');
+    const name = nameElement ? nameElement.innerText.split(' ')[0] : 'there';
+    const messageBox = document.querySelector('.compose-form__message-field');
+    if (messageBox) {
+        messageBox.focus();
+        messageBox.value = messageTemplate.replace('{name}', name);
+        // Simulate input event to ensure LinkedIn registers the change
+        const inputEvent = new Event('input', { bubbles: true });
+        messageBox.dispatchEvent(inputEvent);
+    }
+    dropdown.style.display = 'none';
+}
+
+// Function to make an element draggable
+function makeDraggable(element) {
+    element.style.position = 'absolute';
+    element.style.cursor = 'move';
+    let offsetX, offsetY;
+
+    element.addEventListener('mousedown', (e) => {
+        offsetX = e.clientX - element.getBoundingClientRect().left;
+        offsetY = e.clientY - element.getBoundingClientRect().top;
+        document.addEventListener('mousemove', moveElement);
+        document.addEventListener('mouseup', () => {
+            document.removeEventListener('mousemove', moveElement);
+        });
+    });
+
+    function moveElement(e) {
+        element.style.left = `${e.clientX - offsetX}px`;
+        element.style.top = `${e.clientY - offsetY}px`;
+    }
+}
+
+// Create the chat icon element
+const icon = document.createElement('div');
+icon.textContent = '💬';
+icon.style.position = 'fixed';
+icon.style.bottom = '20px';
+icon.style.right = '20px';
+icon.style.backgroundColor = 'yellow';
+icon.style.color = 'black';
+icon.style.padding = '10px';
+icon.style.borderRadius = '50%';
+icon.style.cursor = 'pointer';
+icon.style.zIndex = '1000';
+
+// Make the chat icon draggable
+makeDraggable(icon);
+
+// Create the dropdown element
+const dropdown = document.createElement('div');
+dropdown.style.display = 'none';
+dropdown.style.position = 'fixed';
+dropdown.style.bottom = '60px';
+dropdown.style.right = '20px';
+dropdown.style.backgroundColor = 'white';
+dropdown.style.border = '1px solid #ccc';
+dropdown.style.padding = '10px';
+dropdown.style.zIndex = '1000';
+
+function updateDropdown() {
+    dropdown.innerHTML = '';
+    messages.forEach((message, index) => {
+        const button = document.createElement('button');
+        button.textContent = message.name;
+        button.style.display = 'block';
+        button.style.width = '100%';
+        button.style.marginBottom = '5px';
+        button.addEventListener('click', () => selectMessage(message.content));
+        dropdown.appendChild(button);
+    });
+    const manageButton = document.createElement('button');
+    manageButton.textContent = 'Manage Templates';
+    manageButton.style.display = 'block';
+    manageButton.style.width = '100%';
+    manageButton.style.marginBottom = '5px';
+    manageButton.addEventListener('click', showManageTemplates);
+    dropdown.appendChild(manageButton);
+}
+
+updateDropdown();
+
+document.body.appendChild(icon);
+document.body.appendChild(dropdown);
+
+// Show the dropdown when the icon is clicked
+icon.addEventListener('click', () => {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close the dropdown if clicking outside of it
+document.addEventListener('click', function (event) {
+    if (!dropdown.contains(event.target) && !icon.contains(event.target)) {
+        dropdown.style.display = 'none';
+    }
+});
+
+// Function to show manage templates UI
+function showManageTemplates() {
+    const manageDiv = document.createElement('div');
+    manageDiv.style.position = 'fixed';
+    manageDiv.style.top = '50%';
+    manageDiv.style.left = '50%';
+    manageDiv.style.transform = 'translate(-50%, -50%)';
+    manageDiv.style.backgroundColor = 'white';
+    manageDiv.style.border = '1px solid #ccc';
+    manageDiv.style.padding = '20px';
+    manageDiv.style.zIndex = '1000';
+
+    const manageTitle = document.createElement('h3');
+    manageTitle.textContent = 'Manage Templates';
+    manageDiv.appendChild(manageTitle);
+
+    messages.forEach((message, index) => {
+        const templateDiv = document.createElement('div');
+        templateDiv.style.marginBottom = '10px';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = message.name;
+        nameInput.style.marginRight = '10px';
+
+        const contentTextarea = document.createElement('textarea');
+        contentTextarea.value = message.content;
+        contentTextarea.style.width = '100%';
+        contentTextarea.style.height = '60px';
+        contentTextarea.style.marginBottom = '5px';
+
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save';
+        saveButton.style.marginRight = '5px';
+        saveButton.addEventListener('click', () => {
+            messages[index].name = nameInput.value;
+            messages[index].content = contentTextarea.value;
+            updateDropdown();
+            document.body.removeChild(manageDiv);
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.style.marginRight = '5px';
+        deleteButton.addEventListener('click', () => {
+            messages.splice(index, 1);
+            updateDropdown();
+            document.body.removeChild(manageDiv);
+        });
+
+        templateDiv.appendChild(nameInput);
+        templateDiv.appendChild(contentTextarea);
+        templateDiv.appendChild(saveButton);
+        templateDiv.appendChild(deleteButton);
+        manageDiv.appendChild(templateDiv);
+    });
+
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Add Template';
+    addButton.addEventListener('click', () => {
+        messages.push({
+            name: `Message ${messages.length + 1}`,
+            content: ''
+        });
+        updateDropdown();
+        document.body.removeChild(manageDiv);
+        showManageTemplates();
+    });
+
+    manageDiv.appendChild(addButton);
+
+    document.body.appendChild(manageDiv);
+}
+
+console.log("Script loaded successfully");
