@@ -1,4 +1,4 @@
-function automateMessaging() {
+function automateMessaging() { 
     const listItems = document.querySelectorAll('li.artdeco-list__item.pl3.pv3');
     let count = 0;
     let messagesSent = 0;
@@ -47,22 +47,22 @@ function automateMessaging() {
                     if (messageField) {
                         const messageContent = `
 Hi ${firstName},
-
 I hope you're doing well.
 
-We specialize in providing top-notch UI/UX design and development services.
+We specialize in providing top-notch UI/UX design and development services & I genuinely think you would love our work
+Check it out here: www.busona.com/our-works
 
-To get an idea of the quality of our work, Please check our portfolio:
+Or to check complete portfolio:
+
 Case Studies: Behance (www.behance.net/busona)
 UI Designs: Dribbble (www.dribbble.com/busona)
-Website: (www.busona.com)
 
-If you're interested to collaborate for design services or if our services align with your needs, I would love to discuss this further.
+If you're interested to collaborate for design services, I would love to discuss this further.
 
 If you’d like to discuss anything in detail, please let me know your availability, and we can schedule a meeting at a time that works for both of us.
 
 I am excited to hear from you.
-
+Would love to connect nevertheless.
 Thank you.
                         `;
                         messageField.value = messageContent.trim();
